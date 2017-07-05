@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>超级玛丽奥-canvas 行走</title>
+</head>
+<body>
+  <canvas id="demo" width="800" height="400"
+  style="border: 1px solid blue;margin:50px auto;display:block;">
+  您的浏览器不支持canvas
+  </canvas>
+  <script>
+     //通过键值判断按下的键盘按键为啥
+     function getDirection (e) {
+       var keyCode = e.keyCode;
+       var direction;
+       switch (keyCode) {
+         case 37:
+             direction = 'left';
+         break;
+         case 38:
+             direction = 'up';
+         break;
+         case 39:
+             direction = 'right';
+         break;
+         case 40:
+             direction = 'down'
+         break;
+       }
+       return direction;
+     }
+     window.onload = function () {
+       var canvas = document.querySelector('#demo'); //获取ID，querySelector也可以用来获取其他元素
+       var context = canvas.getContext('2d');           //环境
+       var mario = new Image();                      //new图片
+       mario.src = 'http://static.blueidea.com/attachment/forum/201207/03/180652md4ydy2txwotdd7l.png'; //图片路径
+       mario.onload = function () {
+         drawMario();
+       }
+       //用json来做配置，局部变量
+       var player = {
+         //大小
+         width:50,
+         height:60,
+         //坐标
+         x:50,
+         y:0,
+        //  剪裁图片开始位置
+        imageX:0,
+        imageY:0,
+        stop:true
+       }
+       //图片绘制
+       function drawMario () {
+         context.drawImage(mario,player.imageX,player.imageY,
+           player.width,player.height,player.x,
+           canvas.height-player.height,//盒子的高度减去图片的高度等于Y方向的位置
+           player.width,player.height)
+       }
+      //行走
+       function playerMove (direction) {
+          clean();
+          if (player.stop) {        //鼠标按下和松开的判断
+            player.imageX = 0;
+          }else {
+            player.imageX +=50;
+          }
+          if (player.imageX>=150) { //防止超出Mario图片边界
+            player.imageX = 0;
+          }
+          if (direction === 'right') {
+            player.x += 5;
+            player.imageY = 0;
+          }else {
+            player.x -= 5;
+            player.imageY = 60;
+          }
+          drawMario ();
+          if (player.x>750){   //防止出canvas边界
+            player.x=750;
+          }
+          if (player.x<0){
+            player.x=0;
+          }
+       }
+       //清楚图片
+       function clean() {
+          context.clearRect(0,0,canvas.width,canvas.height);
+       }
+      //方向判断
+       function playAction (direction) {
+         if (direction === 'right') {
+           playerMove(direction);
+         }else if (direction === 'left'){
+           playerMove(direction);
+         }
+       }
+     //键盘按下事件
+     document.addEventListener ('keydown',
+     function(e){
+          var direction = getDirection(e);
+          player.stop = false;
+          playAction(direction);
+     })
+    //键盘松开事件
+     document.addEventListener ('keyup',
+     function (e) {
+          var direction = getDirection(e);
+          player.stop = true;
+          playAction(direction);
+     })
+     }
+  </script>
+</body>
+</html>
